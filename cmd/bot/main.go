@@ -5,9 +5,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/coutvv/energybot/internal/service/product"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 )
+
+var productService = product.NewService()
 
 func main() {
 	godotenv.Load()
@@ -28,20 +31,32 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			message := update.Message
+			log.Printf("[%s] %s", message.From.UserName, message.Text)
 
-			switch update.Message.Command() {
+			switch message.Command() {
 			case "help":
-				helpCommand(bot, update.Message)
+				helpCommand(bot, message)
+			case "list":
+				listCommand(bot, message)
 			default:
-				defaultBehavior(bot, update.Message)
+				defaultBehavior(bot, message)
 			}
 		}
 	}
 }
 
 func helpCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "Some description of help")
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "/help - for help\n/list - for list of commands")
+	bot.Send(msg)
+}
+
+func listCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+	products := "Here all products\n\n"
+	for _, product := range productService.List() {
+		products += product.Title + "\n"
+	}
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, products)
 	bot.Send(msg)
 }
 
