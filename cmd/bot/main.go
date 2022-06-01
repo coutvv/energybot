@@ -39,16 +39,17 @@ func main() {
 				helpCommand(bot, message)
 			case "list":
 				listCommand(bot, message)
+			case "registry":
+				registry(bot, message)
+			case "map":
+				mapCommand(bot, message)
+			case "status":
+				status(bot, message)
 			default:
 				defaultBehavior(bot, message)
 			}
 		}
 	}
-}
-
-func helpCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "/help - for help\n/list - for list of commands")
-	bot.Send(msg)
 }
 
 func listCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
