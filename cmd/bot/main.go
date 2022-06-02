@@ -45,6 +45,12 @@ func main() {
 				mapCommand(bot, message)
 			case "status":
 				status(bot, message)
+			case "phase":
+				phase(bot, message)
+			case "skipPhase":
+				skip(bot, message)
+			case "moneynote":
+				moneynote(bot, message)
 			default:
 				defaultBehavior(bot, message)
 			}

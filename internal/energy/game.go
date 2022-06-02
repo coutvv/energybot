@@ -1,17 +1,32 @@
 package energy
 
+import (
+	"reflect"
+
+	"github.com/coutvv/energybot/internal/energy/phase"
+)
+
 type EnergyGame struct {
 	players map[string]Player
 	gameMap GameMap
-	phase   Phase
+	phase   phase.PhaseState
 }
 
 func NewGame() EnergyGame {
 	return EnergyGame{
 		players: make(map[string]Player),
 		gameMap: NewSimpleGameMap(),
-		phase:   TORG,
+		phase:   &phase.TorgPhase{},
 	}
+}
+
+func (eg *EnergyGame) Skip(playerName string) {
+	// TODO: fix this
+	eg.phase = eg.phase.NextPhase()
+}
+
+func (eg *EnergyGame) CurrentPhase() string {
+	return reflect.TypeOf(eg.phase).String() // TODO: to normal shit
 }
 
 func (eg *EnergyGame) PlayerStats(name string) string {
@@ -35,12 +50,3 @@ func (eg *EnergyGame) RegistryGamer(name string) bool {
 func (eg *EnergyGame) MapString() string {
 	return eg.gameMap.Show()
 }
-
-type Phase int
-
-const (
-	TORG Phase = iota
-	RESOURCES
-	DOMIKI
-	MONEY
-)

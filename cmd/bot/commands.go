@@ -56,7 +56,13 @@ func registry(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 	)
 }
 
-func phase() {}
+func phase(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+
+	msgText := game.CurrentPhase()
+	bot.Send(
+		tgbotapi.NewMessage(inputMsg.Chat.ID, msgText),
+	)
+}
 
 func mapCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 	msgText := game.MapString()
@@ -76,9 +82,28 @@ func status(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 	)
 }
 
-func moneynote() {}
+func moneynote(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+	prices := map[int]int{
+		0: 10,
+		1: 22,
+		2: 33,
+	}
+	resultNote := ""
+	for k, v := range prices {
+		resultNote += fmt.Sprintf("%d 🏠\t=\t%d$\n", k, v)
+	}
+	bot.Send(
+		tgbotapi.NewMessage(inputMsg.Chat.ID, resultNote),
+	)
+}
 
-func skip() {}
+func skip(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+	var name = inputMsg.From.UserName
+	game.Skip(name)
+	bot.Send(
+		tgbotapi.NewMessage(inputMsg.Chat.ID, fmt.Sprintf("Player %s has been skipped this round", name)),
+	)
+}
 
 // torgi phase
 
