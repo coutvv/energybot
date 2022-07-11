@@ -3,7 +3,7 @@ package phase
 type Phase int
 
 const (
-	TORG Phase = iota
+	TORG Phase = iota + 1
 	RESOURCES
 	DOMIKI
 	MONEY
