@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/coutvv/energybot/internal/energy/db"
+	manager2 "github.com/coutvv/energybot/internal/energy/manager"
+	"log"
 
 	"github.com/coutvv/energybot/internal/energy"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -39,10 +42,20 @@ func helpCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 }
 
 var game = energy.NewGame()
+var repository = db.NewSqliteRepository()
+var manager = manager2.Manager{Repository: repository}
 
 // persistent commands
 
 func registry(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+	user, newOr := manager.RegistryGamer(inputMsg)
+	if newOr {
+		log.Println("register new User in system: ", user)
+	} else {
+		log.Println("user existed already: ", user)
+	}
+
+	// TODO: gaming registry should be moved to Manager maybe
 	var name = inputMsg.From.UserName
 	var registred = game.RegistryGamer(name)
 	var msgText string

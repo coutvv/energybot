@@ -26,6 +26,7 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
+	defer repository.Close()
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			message := update.Message
