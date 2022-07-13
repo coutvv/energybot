@@ -34,7 +34,7 @@ func (eg *EnergyGame) PlayerStats(name string) string {
 	if ok {
 		return player.State()
 	} else {
-		return "no player with that username " + name
+		return "no player with that username: " + name
 	}
 }
 
