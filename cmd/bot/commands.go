@@ -10,10 +10,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-// TODO: may be delete stupid bot API from it (?)
 func helpCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 	helpText := `
-	Ну типа "Энергосеть"
+	Ну типа игра "Энергосеть"
 	Команды:
 	Доступные всегда
 		/registry - войти в игру
@@ -138,5 +137,5 @@ func buy() {}
 
 func setup() {}
 
-// buerucracy phace
+// bureaucracy phace
 func charge() {}
