@@ -30,7 +30,7 @@ func NewSqliteRepository() Repository {
 func newSqliteDb(dbFilename string) sql.DB {
 	if _, err := os.Stat(dbFilename); errors.Is(err, os.ErrNotExist) {
 		os.Remove(dbFilename)
-		log.Println("creating fucking db file")
+		log.Println("creating db file")
 		file, err := os.Create(dbFilename)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -39,7 +39,7 @@ func newSqliteDb(dbFilename string) sql.DB {
 		log.Println("db is created!")
 	}
 	db, _ := sql.Open("sqlite3", "./"+dbFilename)
-	log.Println("fucking db is connected")
+	log.Println("Connection to db is established")
 	return *db
 }
 
