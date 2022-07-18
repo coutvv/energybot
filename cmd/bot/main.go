@@ -1,7 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/coutvv/energybot/internal/energy/db"
+	manager2 "github.com/coutvv/energybot/internal/energy/manager"
+	"github.com/coutvv/energybot/internal/energy/tg"
 	"log"
 	"os"
 
@@ -10,6 +12,7 @@ import (
 )
 
 func main() {
+
 	godotenv.Load()
 	token := os.Getenv("TGTOKEN")
 	bot, err := tgbotapi.NewBotAPI(token)
@@ -26,38 +29,17 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
+	var repository = db.NewSqliteRepository()
+	var manager = manager2.Manager{Repository: repository}
+	commandHelper := tg.NewCommandHelper(bot, manager)
+
 	defer repository.Close()
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			message := update.Message
 			log.Printf("[%s] %s", message.From.UserName, message.Text)
 
-			switch message.Command() {
-			case "help":
-				helpCommand(bot, message)
-			case "registry":
-				registry(bot, message)
-			case "map":
-				mapCommand(bot, message)
-			case "status":
-				status(bot, message)
-			case "phase":
-				phase(bot, message)
-			case "skipPhase":
-				skip(bot, message)
-			case "moneynote":
-				moneynote(bot, message)
-			case "create":
-				create(bot, message)
-			default:
-				defaultBehavior(bot, message)
-			}
+			commandHelper.InvokeCommand(message)
 		}
 	}
-}
-
-func defaultBehavior(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, fmt.Sprintf("You have wrote: %s", inputMsg.Text))
-	msg.ReplyToMessageID = inputMsg.MessageID
-	bot.Send(msg)
 }

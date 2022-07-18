@@ -27,8 +27,7 @@ func (man *Manager) RegistryGamer(inputMsg *tgbotapi.Message) (db.User, bool) {
 	}
 }
 
-func (man *Manager) CreateGame(inputMsg *tgbotapi.Message) bool {
-	chatId := inputMsg.Chat.ID
+func (man *Manager) CreateGame(chatId int64) bool {
 	// check no started game with chatId or else throw error
 	hasStartedGame := man.Repository.HasStartedGame(chatId)
 
