@@ -47,6 +47,8 @@ func main() {
 				skip(bot, message)
 			case "moneynote":
 				moneynote(bot, message)
+			case "create":
+				create(bot, message)
 			default:
 				defaultBehavior(bot, message)
 			}

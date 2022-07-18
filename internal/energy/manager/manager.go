@@ -5,6 +5,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// Mediator between interface (telegram) and business logic
 type Manager struct {
 	Repository db.Repository
 }
@@ -24,4 +25,33 @@ func (man *Manager) RegistryGamer(inputMsg *tgbotapi.Message) (db.User, bool) {
 	} else {
 		return user, false
 	}
+}
+
+func (man *Manager) CreateGame(inputMsg *tgbotapi.Message) bool {
+	chatId := inputMsg.Chat.ID
+	// check no started game with chatId or else throw error
+	hasStartedGame := man.Repository.HasStartedGame(chatId)
+
+	if hasStartedGame {
+		// TODO: return message that can't create game
+		return false
+	} else {
+		man.Repository.CreateGame(db.Game{
+			Status: db.PREPARING,
+			ChatId: chatId,
+		})
+		return true
+	}
+}
+
+func (man *Manager) JoinUser(inputMsg *tgbotapi.Message) {
+
+}
+
+func (man *Manager) StartGame(chatId int64) {
+
+}
+
+func (man *Manager) FinishGame(chatId int64) {
+
 }

@@ -10,12 +10,19 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// TODO: rm registry cause it could be doing in /join
 func helpCommand(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
 	helpText := `
 	Ну типа игра "Энергосеть"
 	Команды:
+		/registry - зарегистрироваться в боте 
+	Управление игрой
+		/create - создать игру (только одна игра на чат)
+		/join - присоединиться к созданной игре, пока она не началась (потом нельзя)
+		/start - начать игру
+		/finish - закончить игру
+
 	Доступные всегда
-		/registry - войти в игру
 		/phase - показать фазу игры
 		/map - показать карту
 		/resources - показать рынок ресурсов
@@ -139,3 +146,19 @@ func setup() {}
 
 // bureaucracy phace
 func charge() {}
+
+// PREPARING GAME FUNCTIONS:
+func create(bot *tgbotapi.BotAPI, inputMsg *tgbotapi.Message) {
+	created := manager.CreateGame(inputMsg)
+	var message = "Can't create game in this chat until last one in process..."
+	if created {
+		message = "Game has created!"
+	}
+	bot.Send(
+		tgbotapi.NewMessage(inputMsg.Chat.ID, message),
+	)
+}
+
+func join()   {}
+func start()  {}
+func finish() {}

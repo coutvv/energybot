@@ -13,6 +13,10 @@ type Repository interface {
 	GetUser(teleId int64) (User, error)
 	SaveUser(user User) bool
 	Close()
+	HasStartedGame(chatId int64) bool
+	CreateGame(game Game) int64
+	JoinGame(userId int64, game Game) GamePlayer
+	ChangeGameState(gameId int64, state State) error
 }
 
 type SqliteRepository struct {
@@ -79,4 +83,72 @@ func (sqRep *SqliteRepository) SaveUser(user User) bool {
 
 func (sqRep *SqliteRepository) Setup() {
 	CreateUserTable(&sqRep.db)
+}
+
+func (sqRep *SqliteRepository) HasStartedGame(chatId int64) bool {
+	row, err := sqRep.db.Query("SELECT * FROM game WHERE game.chat_id = ?;", chatId)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: mb it should not?
+	}
+	for row.Next() {
+		return true
+	}
+	return false
+}
+
+func (sqlRep *SqliteRepository) CreateGame(game Game) int64 {
+	script := `
+		INSERT INTO game (chat_id, state)
+		VALUES (?, ?);
+	`
+	stat, err := sqlRep.db.Prepare(script)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	result, err := stat.Exec(game.ChatId, game.Status)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	println(result)
+	return 0 // TODO: fix to from db
+}
+
+func (sqlRep *SqliteRepository) JoinGame(userId int64, game Game) GamePlayer {
+	script := `
+		INSERT INTO game_player (user_id, game_id)
+		VALUES (?, ?);
+	`
+	stat, err := sqlRep.db.Prepare(script)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	result, err := stat.Exec(userId, game.Id)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	println(result)
+	return GamePlayer{ // TODO: fix to from db
+		Id:     0,
+		GameId: game.Id,
+		UserId: userId,
+	}
+}
+
+func (sqlRep *SqliteRepository) ChangeGameState(gameId int64, state State) error {
+	script := `
+		UPDATE game
+		SET state = ?
+		WHERE id = ?
+	`
+
+	stat, err := sqlRep.db.Prepare(script)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	result, err := stat.Exec(state, gameId)
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: fix fatal
+	}
+	println(result)
+	return nil
 }
