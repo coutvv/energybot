@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS GAME_PLAYER (
     "game_id" integer NOT NULL,
     "user_id" integer NOT NULL,
     FOREIGN KEY (game_id) REFERENCES game(id),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    UNIQUE (game_id, user_id)
 );

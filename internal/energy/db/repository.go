@@ -15,12 +15,29 @@ type Repository interface {
 	Close()
 	HasStartedGame(chatId int64) bool
 	CreateGame(game Game) int64
-	JoinGame(userId int64, game Game) GamePlayer
+	GetUnfinishedGame(chatId int64) (Game, error)
+	JoinGame(userId int64, game Game) (GamePlayer, error)
 	ChangeGameState(gameId int64, state State) error
 }
 
 type SqliteRepository struct {
 	db sql.DB
+}
+
+func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (Game, error) {
+
+	row, err := sqlRep.db.Query(
+		"SELECT id, chat_id, state FROM game WHERE game.state <> ? AND game.chat_id= ? LIMIT 1;", FINISHED, chatId)
+	defer row.Close()
+	if err != nil {
+		log.Fatal("meh some error", err) // TODO: fix it
+	}
+	for row.Next() {
+		var result = Game{}
+		row.Scan(&result.Id, &result.ChatId, &result.Status)
+		return result, nil
+	}
+	return Game{}, errors.New("Not found entity")
 }
 
 func NewSqliteRepository() Repository {
@@ -53,6 +70,7 @@ func (sqlRep *SqliteRepository) Close() {
 
 func (sqRep SqliteRepository) GetUser(teleId int64) (User, error) {
 	row, err := sqRep.db.Query("SELECT * FROM user WHERE user.tele_id = ? LIMIT 1;", teleId)
+	defer row.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: mb it should not?
 	}
@@ -68,6 +86,7 @@ func (sqRep *SqliteRepository) SaveUser(user User) bool {
 		VALUES (?, ?, ?, ?);
 	`
 	stat, err := sqRep.db.Prepare(script)
+	defer stat.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
 		return false
@@ -87,6 +106,7 @@ func (sqRep *SqliteRepository) Setup() {
 
 func (sqRep *SqliteRepository) HasStartedGame(chatId int64) bool {
 	row, err := sqRep.db.Query("SELECT * FROM game WHERE game.chat_id = ?;", chatId)
+	defer row.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: mb it should not?
 	}
@@ -102,6 +122,7 @@ func (sqlRep *SqliteRepository) CreateGame(game Game) int64 {
 		VALUES (?, ?);
 	`
 	stat, err := sqlRep.db.Prepare(script)
+	defer stat.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
 	}
@@ -113,25 +134,29 @@ func (sqlRep *SqliteRepository) CreateGame(game Game) int64 {
 	return 0 // TODO: fix to from db
 }
 
-func (sqlRep *SqliteRepository) JoinGame(userId int64, game Game) GamePlayer {
+func (sqlRep *SqliteRepository) JoinGame(userId int64, game Game) (GamePlayer, error) {
 	script := `
 		INSERT INTO game_player (user_id, game_id)
 		VALUES (?, ?);
 	`
 	stat, err := sqlRep.db.Prepare(script)
+	defer stat.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
 	}
 	result, err := stat.Exec(userId, game.Id)
 	if err != nil {
-		log.Fatal(err.Error()) // TODO: fix fatal
+		log.Println(err.Error())
+		return GamePlayer{}, errors.New("Can't add to game")
 	}
-	println(result)
+	println("fuck it")
+	gamePlayerId, _ := result.LastInsertId()
+	println("fuck it")
 	return GamePlayer{ // TODO: fix to from db
-		Id:     0,
+		Id:     gamePlayerId,
 		GameId: game.Id,
 		UserId: userId,
-	}
+	}, nil
 }
 
 func (sqlRep *SqliteRepository) ChangeGameState(gameId int64, state State) error {
@@ -142,6 +167,7 @@ func (sqlRep *SqliteRepository) ChangeGameState(gameId int64, state State) error
 	`
 
 	stat, err := sqlRep.db.Prepare(script)
+	defer stat.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
 	}

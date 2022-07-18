@@ -24,17 +24,17 @@ func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 		ch.helpCommand(message)
 	case "create":
 		ch.create(message)
+	case "join":
+		ch.join(message)
 	default:
 		ch.defaultBehavior(message)
 	}
 }
 
-// TODO: rm registry cause it could be doing in /join
 func (ch *CommandHelper) helpCommand(inputMsg *tgbotapi.Message) {
 	helpText := `
 	Ну типа игра "Энергосеть"
 	Команды:
-		/registry - зарегистрироваться в боте 
 	Управление игрой
 		/create - создать игру (только одна игра на чат)
 		/join - присоединиться к созданной игре, пока она не началась (потом нельзя)

@@ -43,8 +43,26 @@ func (man *Manager) CreateGame(chatId int64) bool {
 	}
 }
 
-func (man *Manager) JoinUser(inputMsg *tgbotapi.Message) {
-
+func (man *Manager) JoinUser(inputMsg *tgbotapi.Message) bool {
+	teleId := inputMsg.From.ID
+	user, err := man.Repository.GetUser(teleId)
+	if err != nil {
+		// create user
+		user = db.User{TeleId: teleId, UserName: inputMsg.From.UserName, FirstName: inputMsg.From.FirstName, LastName: inputMsg.From.LastName}
+		created := man.Repository.SaveUser(user)
+		if !created {
+			return false
+		}
+	}
+	game, err := man.Repository.GetUnfinishedGame(inputMsg.Chat.ID)
+	if err != nil {
+		return false
+	}
+	_, err = man.Repository.JoinGame(user.Id, game)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func (man *Manager) StartGame(chatId int64) {
