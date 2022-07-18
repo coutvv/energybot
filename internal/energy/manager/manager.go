@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"errors"
 	"github.com/coutvv/energybot/internal/energy/db"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -65,10 +66,24 @@ func (man *Manager) JoinUser(inputMsg *tgbotapi.Message) bool {
 	return true
 }
 
-func (man *Manager) StartGame(chatId int64) {
-
+func (man *Manager) StartGame(chatId int64) error {
+	game, err := man.Repository.GetUnfinishedGame(chatId)
+	if err != nil {
+		return errors.New("not found game")
+	}
+	if game.Status == db.PREPARING {
+		man.Repository.ChangeGameState(game.Id, db.STARTED)
+		return nil
+	} else {
+		return errors.New("game is not in preparing state, so can't start")
+	}
 }
 
-func (man *Manager) FinishGame(chatId int64) {
-
+func (man *Manager) FinishGame(chatId int64) error {
+	game, err := man.Repository.GetUnfinishedGame(chatId)
+	if err != nil {
+		return errors.New("something got wrong in db")
+	}
+	man.Repository.ChangeGameState(game.Id, db.STOPPED)
+	return nil
 }

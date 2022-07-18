@@ -30,10 +30,10 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	var repository = db.NewSqliteRepository()
+	defer repository.Close()
 	var manager = manager2.Manager{Repository: repository}
 	commandHelper := tg.NewCommandHelper(bot, manager)
 
-	defer repository.Close()
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			message := update.Message

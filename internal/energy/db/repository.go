@@ -27,7 +27,8 @@ type SqliteRepository struct {
 func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (Game, error) {
 
 	row, err := sqlRep.db.Query(
-		"SELECT id, chat_id, state FROM game WHERE game.state <> ? AND game.chat_id= ? LIMIT 1;", FINISHED, chatId)
+		"SELECT id, chat_id, state FROM game "+
+			"WHERE game.state <> ? AND game.state <> ? AND game.chat_id= ? LIMIT 1;", FINISHED, STOPPED, chatId)
 	defer row.Close()
 	if err != nil {
 		log.Fatal("meh some error", err) // TODO: fix it
@@ -105,7 +106,8 @@ func (sqRep *SqliteRepository) Setup() {
 }
 
 func (sqRep *SqliteRepository) HasStartedGame(chatId int64) bool {
-	row, err := sqRep.db.Query("SELECT * FROM game WHERE game.chat_id = ?;", chatId)
+	row, err := sqRep.db.Query(
+		"SELECT * FROM game WHERE game.chat_id = ? AND game.state <> ? AND game.state <> ?;", chatId, FINISHED, STOPPED)
 	defer row.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: mb it should not?

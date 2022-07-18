@@ -27,5 +27,21 @@ func (ch *CommandHelper) join(inputMsg *tgbotapi.Message) {
 	}
 
 }
-func (ch *CommandHelper) start()  {}
-func (ch *CommandHelper) finish() {}
+func (ch *CommandHelper) start(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	err := ch.Manager.StartGame(chatId)
+	if err != nil {
+		ch.sendMessage(chatId, err.Error())
+	} else {
+		ch.sendMessage(chatId, "so let the game begin!")
+	}
+}
+func (ch *CommandHelper) finish(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	err := ch.Manager.FinishGame(chatId)
+	if err != nil {
+		ch.sendMessage(chatId, "can't finish game it hasn't create yet or stopped already")
+	} else {
+		ch.sendMessage(chatId, "game has stopped")
+	}
+}

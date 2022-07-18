@@ -26,6 +26,10 @@ func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 		ch.create(message)
 	case "join":
 		ch.join(message)
+	case "start":
+		ch.start(message)
+	case "stop":
+		ch.finish(message)
 	default:
 		ch.defaultBehavior(message)
 	}
@@ -39,7 +43,7 @@ func (ch *CommandHelper) helpCommand(inputMsg *tgbotapi.Message) {
 		/create - создать игру (только одна игра на чат)
 		/join - присоединиться к созданной игре, пока она не началась (потом нельзя)
 		/start - начать игру
-		/finish - закончить игру
+		/stop - остановить игру
 
 	Доступные всегда
 		/phase - показать фазу игры
