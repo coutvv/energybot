@@ -1,15 +1,17 @@
 package energy
 
 import (
+	"github.com/coutvv/energybot/internal/energy/db"
 	"reflect"
 
 	"github.com/coutvv/energybot/internal/energy/phase"
 )
 
 type EnergyGame struct {
-	players map[string]Player
-	gameMap GameMap
-	phase   phase.PhaseState
+	players      map[string]Player
+	gameMap      GameMap
+	phase        phase.PhaseState
+	dbRepository db.Repository
 }
 
 func NewGame() EnergyGame {
@@ -40,10 +42,11 @@ func (eg *EnergyGame) PlayerStats(name string) string {
 
 func (eg *EnergyGame) RegistryGamer(name string) bool {
 	if _, ok := eg.players[name]; ok {
-		// TODO: fuck stupid gamer to the fuck
+		// TODO: no player in the db
 		return false
 	}
 	eg.players[name] = NewPlayer(name)
+	// TODO: save to db
 	return true
 }
 

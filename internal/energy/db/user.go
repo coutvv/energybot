@@ -11,7 +11,7 @@ type User struct {
 	UserName  string
 	FirstName string
 	LastName  string
-	// TODO: don't forget for fucking isBot checking!
+	// TODO: don't forget for isBot checking!
 }
 
 func CreateUserTable(db *sql.DB) {
