@@ -20,6 +20,7 @@ func NewCommandHelper(bot *tgbotapi.BotAPI, manager manager2.Manager) CommandHel
 func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 
 	switch message.Command() {
+
 	case "help":
 		ch.helpCommand(message)
 	case "create":
@@ -30,6 +31,7 @@ func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 		ch.start(message)
 	case "stop":
 		ch.finish(message)
+
 	default:
 		ch.defaultBehavior(message)
 	}
