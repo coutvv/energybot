@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -23,10 +24,28 @@ func (sqlRep *SqliteRepository) Close() {
 }
 
 func NewSqliteRepository() Repository {
+	return NewSqliteRepositoryCustom("trash/energy-web.db", "./sqlite/create_scheme.sql")
+}
+
+func NewSqliteRepositoryCustom(dbFilename string, migrationFile string) Repository {
 	var result = SqliteRepository{
-		db: newSqliteDb("energy-web.db"),
+		db: newSqliteDb(dbFilename),
 	}
+	migrationScripts(&result.db, migrationFile)
 	return &result
+}
+
+func migrationScripts(db *sql.DB, filename string) {
+	var buf, err = ioutil.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	var script = string(buf)
+	_, err = db.Exec(script)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Println("db migration is completed")
 }
 
 func newSqliteDb(dbFilename string) sql.DB {

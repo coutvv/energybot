@@ -42,7 +42,7 @@ func (sqRep SqliteRepository) GetUser(teleId int64) (entity.User, error) {
 	for row.Next() {
 		return userFromDb(row), nil
 	}
-	return entity.User{}, errors.New("no user here man with teleId: " + strconv.FormatInt(teleId, 10))
+	return entity.User{}, errors.New("no user here with teleId: " + strconv.FormatInt(teleId, 10))
 }
 
 func userFromDb(row *sql.Rows) entity.User {

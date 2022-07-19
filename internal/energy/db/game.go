@@ -78,9 +78,7 @@ func (sqlRep *SqliteRepository) JoinGame(userId int64, game entity.Game) (entity
 		log.Println(err.Error())
 		return entity.Player{}, errors.New("Can't add to game")
 	}
-	println("fuck it")
 	gamePlayerId, _ := result.LastInsertId()
-	println("fuck it")
 	return entity.Player{ // TODO: fix to from db
 		Id:     gamePlayerId,
 		GameId: game.Id,

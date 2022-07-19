@@ -1,10 +1,10 @@
 CREATE TABLE  IF NOT EXISTS USER (
-			"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"tele_id" integer UNIQUE,
-			"user_name" TEXT,
-			"first_name" TEXT,
-			"last_name" TEXT
-		);
+    "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "tele_id" integer UNIQUE,
+    "user_name" TEXT,
+    "first_name" TEXT,
+    "last_name" TEXT
+);
 
 
 CREATE TABLE IF NOT EXISTS GAME (

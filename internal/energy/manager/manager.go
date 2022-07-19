@@ -5,6 +5,7 @@ import (
 	"github.com/coutvv/energybot/internal/energy/db"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
 )
 
 // Mediator between interface (telegram) and business logic
@@ -45,18 +46,17 @@ func (man *Manager) CreateGame(chatId int64) bool {
 	}
 }
 
-func (man *Manager) JoinUser(inputMsg *tgbotapi.Message) bool {
-	teleId := inputMsg.From.ID
-	user, err := man.Repository.GetUser(teleId)
+func (man *Manager) JoinUser(chatId int64, userData entity.User) bool {
+	user, err := man.Repository.GetUser(userData.TeleId)
 	if err != nil {
+		log.Println(err.Error())
 		// create user
-		user = entity.User{TeleId: teleId, UserName: inputMsg.From.UserName, FirstName: inputMsg.From.FirstName, LastName: inputMsg.From.LastName}
-		created := man.Repository.SaveUser(user)
+		created := man.Repository.SaveUser(userData)
 		if !created {
 			return false
 		}
 	}
-	game, err := man.Repository.GetUnfinishedGame(inputMsg.Chat.ID)
+	game, err := man.Repository.GetUnfinishedGame(chatId)
 	if err != nil {
 		return false
 	}
