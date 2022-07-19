@@ -2,55 +2,50 @@ package db
 
 import (
 	"database/sql"
+	"errors"
+	"github.com/coutvv/energybot/internal/energy/db/entity"
 	"log"
+	"strconv"
 )
 
-type User struct {
-	Id        int64
-	TeleId    int64
-	UserName  string
-	FirstName string
-	LastName  string
-	// TODO: don't forget for isBot checking!
+type UserRepository interface {
+	GetUser(teleId int64) (entity.User, error)
+	SaveUser(user entity.User) bool
 }
 
-func CreateUserTable(db *sql.DB) {
-	createSQL := `
-		CREATE TABLE  IF NOT EXISTS user (
-			"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-			"tele_id" integer UNIQUE,
-			"user_name" TEXT,
-			"first_name" TEXT,
-			"last_name" TEXT
-		);
-	`
-
-	log.Println("creating user table...")
-	stat, err := db.Prepare(createSQL)
-	if err != nil {
-		log.Fatal(err.Error()) // TODO: no fatal pls
-	}
-	stat.Exec()
-	log.Println("...table user created successfully")
-}
-
-func (user *User) create(db *sql.DB) {
+func (sqRep *SqliteRepository) SaveUser(user entity.User) bool {
 	script := `
 		INSERT INTO user (tele_id, user_name, first_name, last_name)
 		VALUES (?, ?, ?, ?);
 	`
-	stat, err := db.Prepare(script)
+	stat, err := sqRep.db.Prepare(script)
+	defer stat.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
+		return false
 	}
 	_, err2 := stat.Exec(user.TeleId, user.UserName, user.FirstName, user.LastName)
 	if err2 != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
+		return false
 	}
 	log.Println("successing of creating user: " + user.UserName)
+	return true
 }
 
-func userFromDb(row *sql.Rows) User {
+func (sqRep SqliteRepository) GetUser(teleId int64) (entity.User, error) {
+	row, err := sqRep.db.Query("SELECT * FROM user WHERE user.tele_id = ? LIMIT 1;", teleId)
+	defer row.Close()
+	if err != nil {
+		log.Fatal(err.Error()) // TODO: mb it should not?
+	}
+	for row.Next() {
+		return userFromDb(row), nil
+	}
+	return entity.User{}, errors.New("no user here man with teleId: " + strconv.FormatInt(teleId, 10))
+}
+
+func userFromDb(row *sql.Rows) entity.User {
 	var (
 		id        int64
 		teleId    int64
@@ -59,7 +54,7 @@ func userFromDb(row *sql.Rows) User {
 		lastName  string
 	)
 	row.Scan(&id, &teleId, &userName, &firstName, &lastName)
-	return User{
+	return entity.User{
 		Id:        id,
 		TeleId:    teleId,
 		UserName:  userName,

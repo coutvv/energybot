@@ -55,6 +55,7 @@ func (ch *CommandHelper) helpCommand(inputMsg *tgbotapi.Message) {
 		/status {gamer} - состояние игрока (деньги, электростанции)
 		/moneynote - показать подсказку по 
 		/skip - пропустить ход
+
 	Фаза торгов:
 		/choose {1-4-6} - выставить одну из электростанций на торги
 		/pass - спасовать
