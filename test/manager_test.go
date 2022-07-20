@@ -10,7 +10,8 @@ import (
 )
 
 const testDbName = "../trash/test.db"
-const migrationScripts = "../sqlite/create_scheme.sql"
+
+var migrationScripts = []string{"../sqlite/create_scheme.sql", "../sqlite/create_cards.sql"}
 
 func TestManagerFullGameLifeCycle(t *testing.T) {
 

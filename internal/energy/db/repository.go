@@ -25,24 +25,27 @@ func (sqlRep *SqliteRepository) Close() {
 }
 
 func NewSqliteRepository() Repository {
-	return NewSqliteRepositoryCustom("trash/energy-web.db", "./sqlite/create_scheme.sql")
+	return NewSqliteRepositoryCustom("trash/energy-web.db",
+		[]string{"./sqlite/create_scheme.sql", "./sqlite/create_cards.sql"})
 }
 
-func NewSqliteRepositoryCustom(dbFilename string, migrationFile string) Repository {
+func NewSqliteRepositoryCustom(dbFilename string, migrationFile []string) Repository {
 	var result = SqliteRepository{
 		db: newSqliteDb(dbFilename),
 	}
-	migrationScripts(&result.db, migrationFile)
+	for _, filename := range migrationFile {
+		result.MigrationScripts(filename)
+	}
 	return &result
 }
 
-func migrationScripts(db *sql.DB, filename string) {
+func (sqlRep *SqliteRepository) MigrationScripts(filename string) {
 	var buf, err = ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	var script = string(buf)
-	_, err = db.Exec(script)
+	_, err = sqlRep.db.Exec(script)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
