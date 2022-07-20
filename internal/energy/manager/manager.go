@@ -4,30 +4,12 @@ import (
 	"errors"
 	"github.com/coutvv/energybot/internal/energy/db"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 )
 
 // Mediator between interface (telegram) and business logic
 type Manager struct {
 	Repository db.Repository
-}
-
-func (man *Manager) RegistryGamer(inputMsg *tgbotapi.Message) (entity.User, bool) {
-	var teleId = inputMsg.From.ID
-	user, err := man.Repository.GetUser(teleId)
-	if err != nil {
-		var newUser = entity.User{
-			TeleId:    teleId,
-			UserName:  inputMsg.From.UserName,
-			FirstName: inputMsg.From.FirstName,
-			LastName:  inputMsg.From.LastName,
-		}
-		man.Repository.SaveUser(newUser)
-		return newUser, true
-	} else {
-		return user, false
-	}
 }
 
 func (man *Manager) CreateGame(chatId int64) bool {
@@ -51,8 +33,8 @@ func (man *Manager) JoinUser(chatId int64, userData entity.User) bool {
 	if err != nil {
 		log.Println(err.Error())
 		// create user
-		created := man.Repository.SaveUser(userData)
-		if !created {
+		user := man.Repository.SaveUser(userData)
+		if !user {
 			return false
 		}
 	}
@@ -74,6 +56,7 @@ func (man *Manager) StartGame(chatId int64) error {
 	}
 	if game.Status == entity.PREPARING {
 		// prepare player state (add money)
+
 		// prepare deck and station market
 		// prepare resources market
 		// prepare map

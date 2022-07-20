@@ -31,8 +31,8 @@ func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, er
 	return entity.Game{}, errors.New("Not found entity")
 }
 
-func (sqRep *SqliteRepository) HasStartedGame(chatId int64) bool {
-	row, err := sqRep.db.Query(
+func (sqlRep *SqliteRepository) HasStartedGame(chatId int64) bool {
+	row, err := sqlRep.db.Query(
 		"SELECT * FROM game WHERE game.chat_id = ? AND game.state <> ? AND game.state <> ?;",
 		chatId, entity.FINISHED, entity.STOPPED)
 	defer row.Close()
@@ -65,8 +65,8 @@ func (sqlRep *SqliteRepository) CreateGame(game entity.Game) int64 {
 
 func (sqlRep *SqliteRepository) JoinGame(userId int64, game entity.Game) (entity.Player, error) {
 	script := `
-		INSERT INTO game_player (user_id, game_id)
-		VALUES (?, ?);
+		INSERT INTO player (user_id, game_id, money)
+		VALUES (?, ?, 0);
 	`
 	stat, err := sqlRep.db.Prepare(script)
 	defer stat.Close()
