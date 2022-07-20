@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	UserRepository
 	GameRepository
+	PlayerRepository
 	Close()
 }
 
