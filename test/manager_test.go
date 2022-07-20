@@ -23,6 +23,7 @@ func TestManagerFullGameLifeCycle(t *testing.T) {
 
 	manager.CreateGame(chatId)
 	manager.JoinUser(chatId, entity.User{TeleId: 2, UserName: "Test"})
+	manager.JoinUser(chatId, entity.User{TeleId: 3, UserName: "Bob"})
 	startingErr := manager.StartGame(chatId)
 	defer manager.FinishGame(chatId)
 
@@ -33,7 +34,7 @@ func TestManagerFullGameLifeCycle(t *testing.T) {
 	players := repository.GetGamePlayers(game.Id)
 	for _, player := range players {
 		if player.Money != 50 {
-			panic(errors.New("not setted fucking money"))
+			panic(errors.New("not setted money"))
 		}
 	}
 }

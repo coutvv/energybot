@@ -3,6 +3,7 @@ package manager
 import (
 	"errors"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
+	"math/rand"
 )
 
 func (man *Manager) CreateGame(chatId int64) bool {
@@ -28,8 +29,10 @@ func (man *Manager) StartGame(chatId int64) error {
 	}
 	if game.Status == entity.PREPARING {
 		// prepare player state (add money)
-		man.PrepareMoney(game)
+		man.prepareMoney(game)
 		// prepare deck and station market
+		players := man.Repository.GetGamePlayers(game.Id)
+		man.prepareDeck(game, len(players))
 		// prepare resources market
 		// prepare map
 		man.Repository.ChangeGameState(game.Id, entity.STARTED)
@@ -39,7 +42,7 @@ func (man *Manager) StartGame(chatId int64) error {
 	}
 }
 
-func (man *Manager) PrepareMoney(game entity.Game) {
+func (man *Manager) prepareMoney(game entity.Game) {
 	players := man.Repository.GetGamePlayers(game.Id)
 	for _, player := range players {
 		player.Money = 50
@@ -54,4 +57,42 @@ func (man *Manager) FinishGame(chatId int64) error {
 	}
 	man.Repository.ChangeGameState(game.Id, entity.STOPPED)
 	return nil
+}
+
+var mapOfRemovingSmallCards = map[int]int{2: 1, 3: 2, 4: 1, 5: 0, 6: 0}
+var mapOfRemovingBigCards = map[int]int{2: 5, 3: 6, 4: 3, 5: 0, 6: 0}
+
+func (man *Manager) prepareDeck(game entity.Game, numOfPlayers int) {
+	var smallStations []int
+	for i := 3; i < 16; i++ {
+		_, err := man.Repository.GetStation(i)
+		if err == nil {
+			smallStations = append(smallStations, i)
+		}
+	}
+	shuffleSlice(smallStations)
+	game.StationMarket = smallStations[:8]
+	topCard := smallStations[8]
+	smallStations = smallStations[9+mapOfRemovingSmallCards[numOfPlayers]:]
+
+	var bigStations []int
+	for i := 16; i <= 50; i++ {
+		_, err := man.Repository.GetStation(i)
+		if err == nil {
+			bigStations = append(bigStations, i)
+		}
+	}
+	shuffleSlice(bigStations)
+	bigStations = bigStations[mapOfRemovingBigCards[numOfPlayers]:]
+
+	deck := append(smallStations, bigStations...)
+	shuffleSlice(deck)
+	game.Deck = append([]int{topCard}, deck...)
+	man.Repository.SaveGameStatus(game)
+}
+
+func shuffleSlice(ids []int) {
+	rand.Shuffle(len(ids), func(i, j int) {
+		ids[i], ids[j] = ids[j], ids[i]
+	})
 }

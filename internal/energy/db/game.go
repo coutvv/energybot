@@ -2,8 +2,11 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
 	"log"
+	"strconv"
+	"strings"
 )
 
 type GameRepository interface {
@@ -12,12 +15,13 @@ type GameRepository interface {
 	GetUnfinishedGame(chatId int64) (entity.Game, error)
 	JoinGame(userId int64, game entity.Game) (entity.Player, error)
 	ChangeGameState(gameId int64, state entity.State) error
+	SaveGameStatus(game entity.Game)
 }
 
 func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, error) {
 
 	row, err := sqlRep.db.Query(
-		"SELECT id, chat_id, state FROM game "+
+		"SELECT id, chat_id, state, station_market, deck FROM game "+
 			"WHERE game.state <> ? AND game.state <> ? AND game.chat_id= ? LIMIT 1;", entity.FINISHED, entity.STOPPED, chatId)
 	defer row.Close()
 	if err != nil {
@@ -25,7 +29,11 @@ func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, er
 	}
 	for row.Next() {
 		var result = entity.Game{}
-		row.Scan(&result.Id, &result.ChatId, &result.Status)
+		var stationMarket string
+		var deck string
+		row.Scan(&result.Id, &result.ChatId, &result.Status, &stationMarket, &deck)
+		result.Deck = deserializeString(deck)
+		result.StationMarket = deserializeString(stationMarket)
 		return result, nil
 	}
 	return entity.Game{}, errors.New("Not found entity")
@@ -59,8 +67,12 @@ func (sqlRep *SqliteRepository) CreateGame(game entity.Game) int64 {
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: fix fatal
 	}
-	println(result)
-	return 0 // TODO: fix to from db
+	res, err := result.LastInsertId()
+	if err != nil {
+		log.Fatal("can't get id after inserting game", err)
+	}
+	game.Id = res
+	return res
 }
 
 func (sqlRep *SqliteRepository) JoinGame(userId int64, game entity.Game) (entity.Player, error) {
@@ -104,4 +116,32 @@ func (sqlRep *SqliteRepository) ChangeGameState(gameId int64, state entity.State
 	}
 	println(result)
 	return nil
+}
+
+func (sqlRep *SqliteRepository) SaveGameStatus(game entity.Game) {
+	script := `
+		UPDATE game
+		SET station_market = ?, deck = ?
+		WHERE id = ?
+	`
+	market := serializeArray(game.StationMarket)
+	deck := serializeArray(game.Deck)
+	sqlRep.db.Exec(script, market, deck, game.Id)
+}
+
+func serializeArray(array []int) string {
+	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(array)), ","), "[]")
+}
+
+func deserializeString(origin string) []int {
+	if len(origin) == 0 {
+		return []int{}
+	} else {
+		strValue := strings.Split(origin, ",")
+		ary := make([]int, len(strValue))
+		for i, value := range strValue {
+			ary[i], _ = strconv.Atoi(value)
+		}
+		return ary
+	}
 }

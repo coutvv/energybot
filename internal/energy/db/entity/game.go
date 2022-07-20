@@ -15,4 +15,16 @@ type Game struct {
 	Status State
 
 	// TODO: deck
+	StationMarket []int // ids to station cards
+	Deck          []int // ids to station cards
+}
+
+func (game *Game) TopCardIsSmall() bool {
+	var topIsSmall bool
+	if len(game.Deck) == 0 {
+		topIsSmall = false
+	} else {
+		topIsSmall = game.Deck[0] < 16
+	}
+	return topIsSmall
 }

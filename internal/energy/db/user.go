@@ -29,12 +29,15 @@ func (sqlRep *SqliteRepository) SaveUser(user entity.User) bool {
 		log.Fatal(err.Error()) // TODO: fix fatal
 		return false
 	}
-	user.Id, _ = result.LastInsertId()
+	user.Id, err = result.LastInsertId()
+	if err != nil {
+		log.Fatal("get id for user has failed")
+	}
 	log.Println("successing of creating user: " + user.UserName)
 	return true
 }
 
-func (sqlRep SqliteRepository) GetUser(teleId int64) (entity.User, error) {
+func (sqlRep *SqliteRepository) GetUser(teleId int64) (entity.User, error) {
 	row, err := sqlRep.db.Query("SELECT * FROM user WHERE user.tele_id = ? LIMIT 1;", teleId)
 	defer row.Close()
 	if err != nil {

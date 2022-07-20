@@ -32,7 +32,8 @@ func (sqlRep *SqliteRepository) SaveGamePlayerState(player entity.Player) {
 		SET money = ?
 		WHERE id = ?;
 	`
-	_, err := sqlRep.db.Exec(script, player.Money, player.Id)
+	res, err := sqlRep.db.Exec(script, player.Money, player.Id)
+	log.Println("save game player state", res)
 	if err != nil {
 		log.Fatal(err.Error()) // oh god what I should do now?
 	}
