@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS station_card
     "type"   integer -- coal = 1, oil = 2, coal or oil = 3, garbage = 4, nuclear = 5, green = 6, stage3 = 7
 );
 
-INSERT INTO station_card ("id", "number", "domiki",  "resource_count", "type")
+INSERT OR IGNORE INTO station_card ("id", "number", "domiki",  "resource_count", "type")
 VALUES (3, 3, 1, 2, 2),
        (4, 4, 1, 2, 1),
        (5, 5, 1, 2, 3),

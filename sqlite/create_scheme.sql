@@ -10,7 +10,10 @@ CREATE TABLE  IF NOT EXISTS USER (
 CREATE TABLE IF NOT EXISTS GAME (
     "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     "chat_id" integer NOT NULL,
-    "state" integer
+    "state" integer,
+
+    "station_market" text,
+    "deck" text
 );
 
 
