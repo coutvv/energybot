@@ -28,13 +28,11 @@ func (man *Manager) StartGame(chatId int64) error {
 		return errors.New("not found game")
 	}
 	if game.Status == entity.PREPARING {
-		// prepare player state (add money)
-		man.prepareMoney(game)
-		// prepare deck and station market
 		players := man.Repository.GetGamePlayers(game.Id)
-		man.prepareDeck(game, len(players))
-		// prepare resources market
-		// prepare map
+
+		man.prepareMoney(game)
+		man.prepareDeck(&game, len(players))
+		man.prepareResources(&game)
 		man.Repository.ChangeGameState(game.Id, entity.STARTED)
 		return nil
 	} else {
@@ -50,6 +48,14 @@ func (man *Manager) prepareMoney(game entity.Game) {
 	}
 }
 
+func (man *Manager) prepareResources(game *entity.Game) {
+	game.Coal = 24
+	game.Oil = 18
+	game.Garbage = 6
+	game.Nuclear = 2
+	man.Repository.SaveGameStatus(*game)
+}
+
 func (man *Manager) FinishGame(chatId int64) error {
 	game, err := man.Repository.GetUnfinishedGame(chatId)
 	if err != nil {
@@ -62,7 +68,7 @@ func (man *Manager) FinishGame(chatId int64) error {
 var mapOfRemovingSmallCards = map[int]int{2: 1, 3: 2, 4: 1, 5: 0, 6: 0}
 var mapOfRemovingBigCards = map[int]int{2: 5, 3: 6, 4: 3, 5: 0, 6: 0}
 
-func (man *Manager) prepareDeck(game entity.Game, numOfPlayers int) {
+func (man *Manager) prepareDeck(game *entity.Game, numOfPlayers int) {
 	var smallStations []int
 	for i := 3; i < 16; i++ {
 		_, err := man.Repository.GetStation(i)
@@ -88,7 +94,7 @@ func (man *Manager) prepareDeck(game entity.Game, numOfPlayers int) {
 	deck := append(smallStations, bigStations...)
 	shuffleSlice(deck)
 	game.Deck = append([]int{topCard}, deck...)
-	man.Repository.SaveGameStatus(game)
+	man.Repository.SaveGameStatus(*game)
 }
 
 func shuffleSlice(ids []int) {

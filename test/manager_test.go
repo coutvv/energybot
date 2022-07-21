@@ -37,4 +37,10 @@ func TestManagerFullGameLifeCycle(t *testing.T) {
 			panic(errors.New("not setted money"))
 		}
 	}
+	if game.Nuclear != 2 {
+		panic("resources doesn't setup")
+	}
+	if len(game.Deck) == 0 {
+		panic("no setup deck")
+	}
 }

@@ -13,7 +13,12 @@ CREATE TABLE IF NOT EXISTS GAME (
     "state" integer,
 
     "station_market" text,
-    "deck" text
+    "deck" text,
+
+    "coal" integer,
+    "oil" integer,
+    "garbage" integer,
+    "nuclear" integer
 );
 
 
