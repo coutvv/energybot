@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
 	"math/rand"
+	"time"
 )
 
 func (man *Manager) CreateGame(chatId int64) bool {
@@ -76,7 +77,7 @@ func (man *Manager) prepareDeck(game *entity.Game, numOfPlayers int) {
 			smallStations = append(smallStations, i)
 		}
 	}
-	shuffleSlice(smallStations)
+	smallStations = shuffleSlice(smallStations)
 	game.StationMarket = smallStations[:8]
 	topCard := smallStations[8]
 	smallStations = smallStations[9+mapOfRemovingSmallCards[numOfPlayers]:]
@@ -88,17 +89,25 @@ func (man *Manager) prepareDeck(game *entity.Game, numOfPlayers int) {
 			bigStations = append(bigStations, i)
 		}
 	}
-	shuffleSlice(bigStations)
+	bigStations = shuffleSlice(bigStations)
 	bigStations = bigStations[mapOfRemovingBigCards[numOfPlayers]:]
 
 	deck := append(smallStations, bigStations...)
-	shuffleSlice(deck)
-	game.Deck = append([]int{topCard}, deck...)
+	deck = shuffleSlice(deck)
+	deck = append([]int{topCard}, deck...)
+	game.Deck = append(deck, 1000)
 	man.Repository.SaveGameStatus(*game)
 }
 
-func shuffleSlice(ids []int) {
+func shuffleSlice(ids []int) []int {
+	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(ids), func(i, j int) {
 		ids[i], ids[j] = ids[j], ids[i]
 	})
+	dest := make([]int, len(ids))
+	perm := rand.Perm(len(ids)) // more stupid randoming
+	for i, v := range perm {
+		dest[v] = ids[i]
+	}
+	return dest
 }
