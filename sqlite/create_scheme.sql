@@ -18,7 +18,9 @@ CREATE TABLE IF NOT EXISTS GAME (
     "coal" integer,
     "oil" integer,
     "garbage" integer,
-    "nuclear" integer
+    "nuclear" integer,
+
+    "regions" text
 );
 
 

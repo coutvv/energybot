@@ -22,8 +22,8 @@ func TestManagerFullGameLifeCycle(t *testing.T) {
 	manager.FinishGame(chatId)
 
 	manager.CreateGame(chatId)
-	manager.JoinUser(chatId, entity.User{TeleId: 2, UserName: "Test"})
-	manager.JoinUser(chatId, entity.User{TeleId: 3, UserName: "Bob"})
+	manager.JoinUser(chatId, &entity.User{TeleId: 2, UserName: "Test"})
+	manager.JoinUser(chatId, &entity.User{TeleId: 3, UserName: "Bob"})
 	startingErr := manager.StartGame(chatId)
 	defer manager.FinishGame(chatId)
 

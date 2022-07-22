@@ -26,6 +26,8 @@ type Game struct {
 	Oil     int
 	Garbage int
 	Nuclear int
+
+	Regions []string // region ids for this game
 }
 
 func (game *Game) BuyResources(player Player, resType StationType, count int) bool {

@@ -10,10 +10,10 @@ import (
 
 type UserRepository interface {
 	GetUser(teleId int64) (entity.User, error)
-	SaveUser(user entity.User) bool
+	SaveUser(user *entity.User) bool
 }
 
-func (sqlRep *SqliteRepository) SaveUser(user entity.User) bool {
+func (sqlRep *SqliteRepository) SaveUser(user *entity.User) bool {
 	script := `
 		INSERT INTO user (tele_id, user_name, first_name, last_name)
 		VALUES (?, ?, ?, ?);
@@ -38,7 +38,8 @@ func (sqlRep *SqliteRepository) SaveUser(user entity.User) bool {
 }
 
 func (sqlRep *SqliteRepository) GetUser(teleId int64) (entity.User, error) {
-	row, err := sqlRep.db.Query("SELECT * FROM user WHERE user.tele_id = ? LIMIT 1;", teleId)
+	row, err := sqlRep.db.Query("SELECT id, tele_id, user_name, first_name, last_name F"+
+		"ROM user WHERE user.tele_id = ? LIMIT 1;", teleId)
 	defer row.Close()
 	if err != nil {
 		log.Fatal(err.Error()) // TODO: mb it should not?

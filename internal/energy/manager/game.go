@@ -34,6 +34,8 @@ func (man *Manager) StartGame(chatId int64) error {
 		man.prepareMoney(game)
 		man.prepareDeck(&game, len(players))
 		man.prepareResources(&game)
+		man.prepareMapSettings(&game, players)
+
 		man.Repository.ChangeGameState(game.Id, entity.STARTED)
 		return nil
 	} else {
@@ -54,7 +56,7 @@ func (man *Manager) prepareResources(game *entity.Game) {
 	game.Oil = 18
 	game.Garbage = 6
 	game.Nuclear = 2
-	man.Repository.SaveGameStatus(*game)
+	man.Repository.SaveGame(*game)
 }
 
 func (man *Manager) FinishGame(chatId int64) error {
@@ -96,7 +98,7 @@ func (man *Manager) prepareDeck(game *entity.Game, numOfPlayers int) {
 	deck = shuffleSlice(deck)
 	deck = append([]int{topCard}, deck...)
 	game.Deck = append(deck, 1000)
-	man.Repository.SaveGameStatus(*game)
+	man.Repository.SaveGame(*game)
 }
 
 func shuffleSlice(ids []int) []int {
