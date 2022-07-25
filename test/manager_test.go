@@ -28,7 +28,7 @@ func TestManagerFullGameLifeCycle(t *testing.T) {
 	defer manager.FinishGame(chatId)
 
 	if startingErr != nil {
-		log.Fatal("somehting get wrong with starting", startingErr)
+		log.Fatal("something get wrong with starting", startingErr)
 	}
 	game, _ := repository.GetUnfinishedGame(chatId)
 	players := repository.GetGamePlayers(game.Id)
