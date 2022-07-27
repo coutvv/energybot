@@ -51,3 +51,8 @@ func (man *Manager) prepareMapSettings(game *entity.Game, players []entity.Playe
 	}
 	man.Repository.SaveGame(*game)
 }
+
+func (man *Manager) prepareGameOrder(game *entity.Game, players []entity.Player) {
+	game.GameOrder = game.ComputeGameOrder(players)
+	man.Repository.SaveGame(*game)
+}

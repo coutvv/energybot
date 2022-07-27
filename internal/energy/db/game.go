@@ -21,9 +21,10 @@ type GameRepository interface {
 func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, error) {
 
 	row, err := sqlRep.db.Query(
-		"SELECT id, chat_id, state, station_market, deck, coal, oil, garbage, nuclear, regions "+
+		"SELECT id, chat_id, state, station_market, deck, coal, oil, garbage, nuclear, regions, game_order "+
 			"FROM game "+
-			"WHERE game.state <> ? AND game.state <> ? AND game.chat_id= ? LIMIT 1;", entity.FINISHED, entity.STOPPED, chatId)
+			"WHERE game.state <> ? AND game.state <> ? AND game.chat_id= ? LIMIT 1;",
+		entity.FINISHED, entity.STOPPED, chatId)
 	defer row.Close()
 	if err != nil {
 		log.Fatal("meh some error", err) // TODO: fix it
@@ -33,12 +34,14 @@ func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, er
 		var stationMarket string
 		var deck string
 		var regions string
+		var gameOrder string
 		row.Scan(
 			&result.Id, &result.ChatId, &result.Status, &stationMarket, &deck,
-			&result.Coal, &result.Oil, &result.Garbage, &result.Nuclear, &regions)
+			&result.Coal, &result.Oil, &result.Garbage, &result.Nuclear, &regions, &gameOrder)
 		result.Deck = deserializeArray(deck)
 		result.StationMarket = deserializeArray(stationMarket)
 		result.Regions = deserializeStrArray(regions)
+		result.GameOrder = deserializeArray64(gameOrder)
 		return result, nil
 	}
 	return entity.Game{}, errors.New("Not found entity")
@@ -127,7 +130,8 @@ func (sqlRep *SqliteRepository) SaveGame(game entity.Game) {
 	script := `
 		UPDATE game
 		SET station_market = ?, deck = ?,
-			coal = ?, oil = ?, garbage = ?, nuclear = ?, regions = ? 
+			coal = ?, oil = ?, garbage = ?, nuclear = ?, regions = ?,
+			game_order = ?
 		WHERE id = ?
 	`
 	market := serializeArray(game.StationMarket)
@@ -135,10 +139,15 @@ func (sqlRep *SqliteRepository) SaveGame(game entity.Game) {
 	sqlRep.db.Exec(script, market, deck,
 		game.Coal, game.Oil, game.Garbage, game.Nuclear,
 		serializeStrArray(game.Regions),
+		serializeArray64(game.GameOrder),
 		game.Id)
 }
 
 func serializeArray(array []int) string {
+	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(array)), ","), "[]")
+}
+
+func serializeArray64(array []int64) string {
 	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(array)), ","), "[]")
 }
 
@@ -150,6 +159,18 @@ func deserializeArray(origin string) []int {
 		ary := make([]int, len(strValue))
 		for i, value := range strValue {
 			ary[i], _ = strconv.Atoi(value)
+		}
+		return ary
+	}
+}
+func deserializeArray64(origin string) []int64 {
+	if len(origin) == 0 {
+		return []int64{}
+	} else {
+		strValue := strings.Split(origin, ",")
+		ary := make([]int64, len(strValue))
+		for i, value := range strValue {
+			ary[i], _ = strconv.ParseInt(value, 10, 64)
 		}
 		return ary
 	}

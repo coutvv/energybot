@@ -35,7 +35,7 @@ func (man *Manager) StartGame(chatId int64) error {
 		man.prepareDeck(&game, len(players))
 		man.prepareResources(&game)
 		man.prepareMapSettings(&game, players)
-
+		man.prepareGameOrder(&game, players)
 		man.Repository.ChangeGameState(game.Id, entity.STARTED)
 		return nil
 	} else {

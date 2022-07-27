@@ -5,5 +5,8 @@ type Player struct {
 	GameId int64
 	UserId int64
 	// Some other game properties
-	Money int
+	Money     int
+	Station   []int
+	Resources []int
+	Cities    []string
 }

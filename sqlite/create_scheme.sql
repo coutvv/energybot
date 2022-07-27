@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS GAME (
     "garbage" integer,
     "nuclear" integer,
 
-    "regions" text
+    "regions" text,
+    "game_order" text
 );
 
 

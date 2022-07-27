@@ -3,6 +3,9 @@ package entity
 import (
 	"errors"
 	"log"
+	"math/rand"
+	"sort"
+	"time"
 )
 
 type State int
@@ -27,7 +30,48 @@ type Game struct {
 	Garbage int
 	Nuclear int
 
-	Regions []string // region ids for this game
+	Regions   []string // region ids for this game
+	GameOrder []int64  // ids to players
+}
+
+func (game *Game) ComputeGameOrder(players []Player) []int64 {
+	var ids []int64
+	for _, player := range players {
+		ids = append(ids, player.Id)
+	}
+	if len(players[0].Station) == 0 {
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(ids), func(i, j int) {
+			ids[i], ids[j] = ids[j], ids[i]
+		})
+	} else {
+		sort.Slice(players, func(i, j int) bool {
+			iCities := len(players[i].Cities)
+			jCities := len(players[j].Cities)
+			if iCities == jCities {
+				return maxStationNumber(players[i].Station) < maxStationNumber(players[j].Station)
+			} else {
+				return iCities < jCities
+			}
+		})
+		var result []int64
+		for _, player := range players {
+			result = append(result, player.Id)
+		}
+		ids = result
+	}
+
+	return ids
+}
+
+func maxStationNumber(stations []int) int {
+	result := stations[0]
+	for _, num := range stations {
+		if num > result {
+			result = num
+		}
+	}
+	return result
 }
 
 func (game *Game) BuyResources(player Player, resType StationType, count int) bool {
