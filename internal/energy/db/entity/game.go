@@ -32,7 +32,18 @@ type Game struct {
 
 	Regions   []string // region ids for this game
 	GameOrder []int64  // ids to players
+	GamePhase Phase
 }
+
+type Phase int
+
+const (
+	INIT Phase = iota + 0 // same as BARGAIN, but with reordering players after
+	BARGAIN
+	RESOURCE
+	DOMIKI
+	CHARGE
+)
 
 func (game *Game) ComputeGameOrder(players []Player) []int64 {
 	var ids []int64

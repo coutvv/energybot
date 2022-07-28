@@ -21,7 +21,7 @@ type GameRepository interface {
 func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, error) {
 
 	row, err := sqlRep.db.Query(
-		"SELECT id, chat_id, state, station_market, deck, coal, oil, garbage, nuclear, regions, game_order "+
+		"SELECT id, chat_id, state, station_market, deck, coal, oil, garbage, nuclear, regions, game_order, game_phase "+
 			"FROM game "+
 			"WHERE game.state <> ? AND game.state <> ? AND game.chat_id= ? LIMIT 1;",
 		entity.FINISHED, entity.STOPPED, chatId)
@@ -37,7 +37,7 @@ func (sqlRep *SqliteRepository) GetUnfinishedGame(chatId int64) (entity.Game, er
 		var gameOrder string
 		row.Scan(
 			&result.Id, &result.ChatId, &result.Status, &stationMarket, &deck,
-			&result.Coal, &result.Oil, &result.Garbage, &result.Nuclear, &regions, &gameOrder)
+			&result.Coal, &result.Oil, &result.Garbage, &result.Nuclear, &regions, &gameOrder, &result.GamePhase)
 		result.Deck = deserializeArray(deck)
 		result.StationMarket = deserializeArray(stationMarket)
 		result.Regions = deserializeStrArray(regions)
@@ -131,7 +131,7 @@ func (sqlRep *SqliteRepository) SaveGame(game entity.Game) {
 		UPDATE game
 		SET station_market = ?, deck = ?,
 			coal = ?, oil = ?, garbage = ?, nuclear = ?, regions = ?,
-			game_order = ?
+			game_order = ?, game_phase = ?
 		WHERE id = ?
 	`
 	market := serializeArray(game.StationMarket)
@@ -139,7 +139,7 @@ func (sqlRep *SqliteRepository) SaveGame(game entity.Game) {
 	sqlRep.db.Exec(script, market, deck,
 		game.Coal, game.Oil, game.Garbage, game.Nuclear,
 		serializeStrArray(game.Regions),
-		serializeArray64(game.GameOrder),
+		serializeArray64(game.GameOrder), game.GamePhase,
 		game.Id)
 }
 

@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS GAME (
     "nuclear" integer,
 
     "regions" text,
-    "game_order" text
+    "game_order" text,
+    "game_phase" integer
 );
 
 
