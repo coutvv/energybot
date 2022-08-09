@@ -26,7 +26,7 @@ func (ch *CommandHelper) join(inputMsg *tgbotapi.Message) {
 		FirstName: inputMsg.From.FirstName,
 		LastName:  inputMsg.From.LastName,
 	}
-	if ch.Manager.JoinUser(chatId, user) {
+	if ch.Manager.JoinUser(chatId, &user) {
 		ch.sendMessage(chatId, "User has joined: "+strconv.FormatInt(userId, 10))
 	} else {
 		ch.sendMessage(chatId, "User can't join to game "+strconv.FormatInt(userId, 10))
