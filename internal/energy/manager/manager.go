@@ -1,9 +1,11 @@
 package manager
 
 import (
+	"errors"
+	"log"
+
 	"github.com/coutvv/energybot/internal/energy/db"
 	"github.com/coutvv/energybot/internal/energy/db/entity"
-	"log"
 )
 
 // Mediator between interface (telegram) and business logic
@@ -33,7 +35,7 @@ func (man *Manager) JoinUser(chatId int64, userData *entity.User) bool {
 	return true
 }
 
-func (man *Manager) prepareMapSettings(game *entity.Game, players []entity.Player) {
+func (man *Manager) prepareMapSettings(game *entity.Game, players []entity.Player) error {
 	playerCount := len(players)
 	switch playerCount {
 	case 2:
@@ -47,9 +49,10 @@ func (man *Manager) prepareMapSettings(game *entity.Game, players []entity.Playe
 	case 6:
 		game.Regions = []string{"A", "B", "C", "D", "E", "F"}
 	default:
-		log.Fatal("incorrect number of players")
+		return errors.New("incorrect number of players need more!")
 	}
 	man.Repository.SaveGame(*game)
+	return nil
 }
 
 func (man *Manager) prepareGameOrder(game *entity.Game, players []entity.Player) {

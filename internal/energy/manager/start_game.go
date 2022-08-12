@@ -2,9 +2,10 @@ package manager
 
 import (
 	"errors"
-	"github.com/coutvv/energybot/internal/energy/db/entity"
 	"math/rand"
 	"time"
+
+	"github.com/coutvv/energybot/internal/energy/db/entity"
 )
 
 func (man *Manager) CreateGame(chatId int64) bool {
@@ -34,7 +35,10 @@ func (man *Manager) StartGame(chatId int64) error {
 		man.prepareMoney(game)
 		man.prepareDeck(&game, len(players))
 		man.prepareResources(&game)
-		man.prepareMapSettings(&game, players)
+		err := man.prepareMapSettings(&game, players)
+		if err != nil {
+			return err
+		}
 		man.prepareGameOrder(&game, players)
 		man.Repository.ChangeGameState(game.Id, entity.STARTED)
 		return nil

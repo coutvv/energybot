@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/coutvv/energybot/internal/energy/db"
 	manager2 "github.com/coutvv/energybot/internal/energy/manager"
 	"github.com/coutvv/energybot/internal/energy/tg"
-	"log"
-	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"

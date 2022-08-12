@@ -2,6 +2,7 @@ package tg
 
 import (
 	"fmt"
+
 	manager2 "github.com/coutvv/energybot/internal/energy/manager"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -31,7 +32,8 @@ func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 		ch.start(message)
 	case "stop":
 		ch.finish(message)
-
+	case "phase":
+		ch.phase(message)
 	default:
 		ch.defaultBehavior(message)
 	}
