@@ -12,7 +12,7 @@ func (ch *CommandHelper) phase(inputMsg *tgbotapi.Message) {
 	var phase string
 	switch game.GamePhase {
 	case 0:
-		phase = "torgi"
+		phase = "torgi init"
 	case 1:
 		phase = "torgi"
 	case 2:
@@ -26,4 +26,34 @@ func (ch *CommandHelper) phase(inputMsg *tgbotapi.Message) {
 	}
 
 	ch.sendMessage(chatId, "Current phase is: "+phase)
+}
+
+func (ch *CommandHelper) mapka(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
+}
+
+func (ch *CommandHelper) resources(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
+}
+
+func (ch *CommandHelper) market(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
+}
+
+func (ch *CommandHelper) status(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
+}
+
+func (ch *CommandHelper) moneynote(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
+}
+
+func (ch *CommandHelper) skip(inputMsg *tgbotapi.Message) {
+	chatId := inputMsg.Chat.ID
+	ch.sendMessage(chatId, "not implemented yet")
 }

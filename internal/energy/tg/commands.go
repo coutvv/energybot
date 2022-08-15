@@ -32,8 +32,22 @@ func (ch *CommandHelper) InvokeCommand(message *tgbotapi.Message) {
 		ch.start(message)
 	case "stop":
 		ch.finish(message)
+
 	case "phase":
 		ch.phase(message)
+	case "map":
+		ch.mapka(message)
+	case "resources":
+		ch.resources(message)
+	case "market":
+		ch.market(message)
+	case "status":
+		ch.status(message)
+	case "moneynote":
+		ch.moneynote(message)
+	case "skip":
+		ch.skip(message)
+
 	default:
 		ch.defaultBehavior(message)
 	}
@@ -55,7 +69,7 @@ func (ch *CommandHelper) helpCommand(inputMsg *tgbotapi.Message) {
 		/resources - показать рынок ресурсов
 		/market	- электростанции на продаже
 		/status {gamer} - состояние игрока (деньги, электростанции)
-		/moneynote - показать подсказку по 
+		/moneynote - показать подсказку по тому сколько денег за домики дадут
 		/skip - пропустить ход
 
 	Фаза торгов:
