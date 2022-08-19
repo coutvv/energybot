@@ -14,6 +14,7 @@ type Repository interface {
 	GameRepository
 	PlayerRepository
 	StationCardRepository
+	RegionMapRepository
 	Close()
 }
 
@@ -27,7 +28,7 @@ func (sqlRep *SqliteRepository) Close() {
 
 func NewSqliteRepository() Repository {
 	return NewSqliteRepositoryCustom("trash/energy-web.db",
-		[]string{"./sqlite/create_scheme.sql", "./sqlite/create_cards.sql"})
+		[]string{"./sqlite/create_scheme.sql", "./sqlite/create_cards.sql", "./sqlite/create_map.sql"})
 }
 
 func NewSqliteRepositoryCustom(dbFilename string, migrationFile []string) Repository {
