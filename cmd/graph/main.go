@@ -11,11 +11,14 @@ import (
 func main() {
 	var repository = db.NewSqliteRepository()
 
+	cities := repository.GetAllCities()
 	cables := repository.GetAllCables()
 	fmt.Println(cables)
 	graph :=	mappath.CablesToGraph(cables)
 	fmt.Println(graph)
-	result := mappath.FindPathPrices(graph, "1A")
-	fmt.Println(result)
+	for _, city := range cities {
+		result := mappath.FindPathPrices(graph, city.Id)
+		fmt.Println(result)
+	}
 
 }
