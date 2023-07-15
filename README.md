@@ -1,4 +1,4 @@
-# The best implementation of "Energy Web" board game
+# The best implementation of ["Power Grid"](https://en.wikipedia.org/wiki/Power_Grid) board game
 
 
 ### Dependencies: 
@@ -11,3 +11,4 @@
 ### Running
 
 make run 
+
